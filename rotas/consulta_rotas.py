@@ -3,6 +3,8 @@ from app import app
 from banco import banco
 from modelos import Usuario, Paciente, Medico, Consulta
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 @app.post("/consultas")
 def criar_consulta():
     dados = request.json
