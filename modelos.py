@@ -41,6 +41,10 @@ class Consulta(banco.Model):
         banco.ForeignKey("medico.id")
     )
 
+    usuario_id = banco.Column(
+        banco.Integer,
+        banco.ForeignKey("usuario.id")
+    )
 
     paciente = banco.relationship(
         "Paciente"
@@ -48,4 +52,8 @@ class Consulta(banco.Model):
 
     medico = banco.relationship(
         "Medico"
+    )
+
+    usuario = banco.relationship(
+        "Usuario"
     )
