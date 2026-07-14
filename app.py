@@ -1,4 +1,5 @@
 from flask import Flask
+from flasgger import Swagger
 from banco import banco
 
 app = Flask(__name__)
@@ -6,9 +7,11 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///banco.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+Swagger(app)  # pode ficar aqui
+
 banco.init_app(app)
 
-import modelos  
+import modelos
 from rotas import *
 
 with app.app_context():
@@ -17,5 +20,5 @@ with app.app_context():
 @app.route("/")
 def inicio():
     return {
-        "mensagem": "API Clínica Médica funcionando!"
+        "mensagem": "API Clínica Médica funcionando!",
     }

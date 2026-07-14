@@ -27,18 +27,13 @@ class Medico(banco.Model):
 # Classe Consulta
 class Consulta(banco.Model):
     id = banco.Column(banco.Integer, primary_key=True)
+
     data = banco.Column(banco.String(20))
     horario = banco.Column(banco.String(10))
-
 
     paciente_id = banco.Column(
         banco.Integer,
         banco.ForeignKey("paciente.id")
-    )
-
-    consulta_id = banco.Column(
-        banco.Integer,
-        banco.ForeignKey("consulta.id")
     )
 
     medico_id = banco.Column(
@@ -51,18 +46,6 @@ class Consulta(banco.Model):
         banco.ForeignKey("usuario.id")
     )
 
-    paciente = banco.relationship(
-        "Paciente"
-    )
-
-    consulta = banco.relationship(
-        "Consulta"
-    )
-
-    medico = banco.relationship(
-        "Medico"
-    )
-
-    usuario = banco.relationship(
-        "Usuario"
-    )
+    paciente = banco.relationship("Paciente")
+    medico = banco.relationship("Medico")
+    usuario = banco.relationship("Usuario")

@@ -1,14 +1,42 @@
 from flask import request, jsonify
 from app import app
 from banco import banco
-from modelos import Usuario, Paciente, Medico, Consulta
-
-from werkzeug.security import generate_password_hash, check_password_hash
+from modelos import Consulta
 
 @app.post("/consultas")
-def criar_consulta():
+def agendar_consulta():
+    """
+    Agendar uma nova consulta
+    ---
+    tags:
+      - Consultas
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            data:
+              type: string
+              example: "2026-07-20"
+            horario:
+              type: string
+              example: "14:30"
+            paciente_id:
+              type: integer
+              example: 1
+            medico_id:
+              type: integer
+              example: 1
+            usuario_id:
+              type: integer
+              example: 1
+    responses:
+      200:
+        description: Consulta agendada com sucesso!
+    """
     dados = request.json
-
     consulta = Consulta(
         data=dados["data"],
         horario=dados["horario"],
@@ -16,21 +44,24 @@ def criar_consulta():
         medico_id=dados["medico_id"],
         usuario_id=dados["usuario_id"]
     )
-
     banco.session.add(consulta)
     banco.session.commit()
+    return {"mensagem": "Consulta agendada!"}
 
-    return {
-        "mensagem": "Consulta cadastrada!"
-    }
 
 @app.get("/consultas")
 def listar_consultas():
-
+    """
+    Listar todas as consultas agendadas
+    ---
+    tags:
+      - Consultas
+    responses:
+      200:
+        description: Lista de consultas retornada
+    """
     consultas = Consulta.query.all()
-
     resultado = []
-
     for c in consultas:
         resultado.append({
             "id": c.id,
@@ -40,46 +71,82 @@ def listar_consultas():
             "medico_id": c.medico_id,
             "usuario_id": c.usuario_id
         })
-
     return jsonify(resultado)
+
 
 @app.put("/consultas/<int:id>")
 def atualizar_consulta(id):
-
+    """
+    Reagendar ou modificar uma consulta
+    ---
+    tags:
+      - Consultas
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            data:
+              type: string
+              example: "2026-07-25"
+            horario:
+              type: string
+              example: "16:00"
+            paciente_id:
+              type: integer
+              example: 1
+            medico_id:
+              type: integer
+              example: 1
+            usuario_id:
+              type: integer
+              example: 1
+    responses:
+      200:
+        description: Consulta reagendada com sucesso!
+    """
     dados = request.json
-
     consulta = Consulta.query.get(id)
-
+    
     if not consulta:
-        return {
-            "mensagem": "Consulta não encontrada"
-        }, 404
-
+        return jsonify({"mensagem": "Consulta não encontrada"}), 404
+        
     consulta.data = dados.get("data", consulta.data)
     consulta.horario = dados.get("horario", consulta.horario)
     consulta.paciente_id = dados.get("paciente_id", consulta.paciente_id)
     consulta.medico_id = dados.get("medico_id", consulta.medico_id)
     consulta.usuario_id = dados.get("usuario_id", consulta.usuario_id)
-
+    
     banco.session.commit()
+    return jsonify({"mensagem": "Consulta atualizada com sucesso!"})
 
-    return {
-        "mensagem": "Consulta atualizada!"
-    }
 
 @app.delete("/consultas/<int:id>")
 def deletar_consulta(id):
-
+    """
+    Cancelar uma consulta pelo ID
+    ---
+    tags:
+      - Consultas
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Consulta cancelada com sucesso
+    """
     consulta = Consulta.query.get(id)
-
     if not consulta:
-        return {
-            "mensagem": "Consulta não encontrada"
-        }, 404
+        return jsonify({"mensagem": "Consulta não encontrada"}), 404
 
     banco.session.delete(consulta)
     banco.session.commit()
-
-    return {
-        "mensagem": "Consulta removida!"
-    }
+    return {"mensagem": "Consulta cancelada"}
