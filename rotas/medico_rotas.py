@@ -1,7 +1,9 @@
 from flask import request, jsonify
 from app import app
 from banco import banco
-from modelos import Medico
+from modelos import Usuario, Paciente, Medico, Consulta
+
+from werkzeug.security import generate_password_hash, check_password_hash
 
 @app.post("/medicos")
 def criar_medico():
